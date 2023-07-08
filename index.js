@@ -20,16 +20,26 @@ function zoneParameters () {
 // read row of csv
 reader.on("line", row => {
 
-    let data = [];
-        data.push(row.split(","));
-        console.log(data)
+    // store data in array
+    let rawData = [];
+        rawData.push(row.split(","));
 
-    // establish output variables
+    let data = rawData.flat()
+
     // store zone in zone variable
-    // create variable for csv output (using zone variable where appropriate)
+    let zone = data[2]
+
+    // establish output variables (using zone variable where appropriate)
+    let output = `./outputs/zone${zone}.csv`
+
+    console.log(data, output)
+
     // axios request to geocoding API for municipality boundary coordinates
+
     // retrieve municipality boundary coordinates
+
     // store coordinates in array using correct format (should match grow-a-pear backend data)
+    
     // push array to csv output (output stored in correct variable from before)
 
   });
