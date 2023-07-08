@@ -32,9 +32,17 @@ reader.on("line", row => {
     // establish output variables (using zone variable where appropriate)
     let output = `./outputs/zone${zone}.csv`
 
-    console.log(data, output)
+    console.log(data[0], data[1], output)
 
     // axios request to geocoding API for municipality boundary coordinates
+    axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${data[0]}&key=${data[1]}`)
+        .then (response => {
+            const geocoding = response.data
+            console.log(geocoding)
+        })
+        .catch (error => {
+            console.error("Error:", error.message)
+        })
 
     // retrieve municipality boundary coordinates
 
