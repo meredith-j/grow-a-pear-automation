@@ -1,3 +1,7 @@
-#dependencies
-
 /node_modules
+.DS_Store
+.env
+*.xlsx
+*.csv
+
+!sample_input.csv
