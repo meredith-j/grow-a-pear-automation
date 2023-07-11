@@ -34,8 +34,18 @@ reader.on("line", row => {
 
     console.log(data[0], data[1], output)
 
+    if (zone === "") {
+        fs.appendFile("./outputs/input-errors.csv", `\n${data.toString()}`, "utf8", function(err){
+            if (err) {
+                console.log(err)
+            }
+        })
+
+        return
+    }
+
     // axios request to geocoding API for municipality boundary coordinates
-    axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${data[0]}&key=${data[1]}`)
+    axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${data[0]}&${data[1]}$canada&key=${API_KEY}`)
         .then (response => {
             const geocoding = response.data
             console.log(geocoding)
