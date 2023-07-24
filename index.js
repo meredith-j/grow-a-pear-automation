@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 8080;
 const API_KEY = process.env.API_KEY;
 
 
-const csvFilePath = "./inputs/test_input.csv";
+const csvFilePath = "./inputs/sample_input.csv";
 
 function zoneParameters () {
     console.log(`function running on ${PORT} 🚀`)
@@ -32,6 +32,10 @@ reader.on("line", row => {
     // establish output variables (using zone variable where appropriate)
     let output = `./outputs/zone${zone}.csv`
 
+    if (data[0] === "municipality") {
+        return
+    }
+
     console.log(data[0], data[1], output)
 
     if (zone === "") {
@@ -44,10 +48,10 @@ reader.on("line", row => {
         return
     }
 
-    // axios request to geocoding API for municipality boundary coordinates
+    // axios request to geocoding API for municipality boundary coordinates (request is for "geometry")
     axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${data[0]}&${data[1]}$canada&key=${API_KEY}`)
         .then (response => {
-            const geocoding = response.data
+            const geocoding = response.data.results[0].geometry
             console.log(geocoding)
         })
         .catch (error => {

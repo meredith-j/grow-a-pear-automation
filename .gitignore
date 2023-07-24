@@ -3,5 +3,3 @@
 .env
 *.xlsx
 *.csv
-
-!sample_input.csv
