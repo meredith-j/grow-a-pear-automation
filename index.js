@@ -65,7 +65,14 @@ reader.on("line", row => {
             // store coordinates in array using correct format (should match grow-a-pear backend data)
             const param = [southWestParam, southEastParam, northEastParam, northWestParam]
 
-            console.log(param)
+            console.log("param", param)
+
+            fs.appendFile(output, `[${param.toString()}]\n`, "utf8", function(err){
+                if (err) {
+                    console.log(err)
+                }
+            })
+    
         })
         .catch (error => {
             console.error("Error:", error.message)
