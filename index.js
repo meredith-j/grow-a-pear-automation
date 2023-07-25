@@ -47,15 +47,11 @@ reader.on("line", row => {
         return
     }
 
-    console.log(output)
-
     // axios request to geocoding API for municipality boundary coordinates (request is for "geometry")
     axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${data[0]}&${data[1]}$canada&key=${API_KEY}`)
         .then (response => {
 
             // retrieve municipality boundary coordinates
-            const geocoding = response.data.results[0].geometry.bounds
-
             const southEastParam = [response.data.results[0].geometry.bounds.northeast.lng, response.data.results[0].geometry.bounds.southwest.lat];
             const southWestParam = [response.data.results[0].geometry.bounds.southwest.lng, response.data.results[0].geometry.bounds.southwest.lat];
             const northEastParam = [response.data.results[0].geometry.bounds.northeast.lng, response.data.results[0].geometry.bounds.northeast.lat];
@@ -66,6 +62,7 @@ reader.on("line", row => {
 
             console.log(data[0], data[1], zone, "param", param)
 
+            // push array to csv output (output stored in correct variable from before)
             fs.appendFile(output, `[${param.toString()}]\n`, "utf8", function(err){
                 if (err) {
                     console.log(err)
@@ -74,13 +71,19 @@ reader.on("line", row => {
     
         })
         .catch (error => {
+
+            // add to error output csv file
+            fs.appendFile("./outputs/input-errors.csv", `${data.toString()}\n`, "utf8", function(err){
+                if (err) {
+                    console.log(err)
+                    console.log(data[0], data[1], zone, "error with google API")
+                }
+            })
+
             console.error("Error:", error.message)
         })
 
     
-    
-    // push array to csv output (output stored in correct variable from before)
-
   });
 
 reader.on("close", () => {
