@@ -7,8 +7,10 @@ const PORT = process.env.PORT || 8080;
 const API_KEY = process.env.API_KEY;
 
 
-const csvFilePath = "./inputs/sample_input.csv";
-// real file path: hardiness_zone_input_data
+const csvFilePath = "./inputs/hardiness_zone_input_data.csv";
+// actual data in file: hardiness_zone_input_data.csv
+// test data file: sample_input.csv
+// bigger test data file: test_input.csv
 
 function zoneParameters () {
     console.log(`function running on ${PORT} 🚀`)
@@ -33,19 +35,18 @@ reader.on("line", row => {
     // establish output variables (using zone variable where appropriate)
     let output = `./outputs/zone${zone}.csv`
 
-    if (data[0] === "municipality") {
+    if (data[1] === "Province/Territory") {
         return
     }
 
-    console.log(data[0], data[1], output)
-
     if (zone === "") {
-        fs.appendFile("./outputs/input-errors.csv", `\n${data.toString()}`, "utf8", function(err){
+        fs.appendFile("./outputs/input-errors.csv", `${data.toString()} zone empty,\n`, "utf8", function(err){
             if (err) {
-                console.log(err)
+                console.log(err, data)
             }
         })
 
+        console.log(data[0], data[1], "error: no zone")
         return
     }
 
@@ -54,28 +55,49 @@ reader.on("line", row => {
         .then (response => {
 
             // retrieve municipality boundary coordinates
-            const geocoding = response.data.results[0].geometry.bounds
-
             const southEastParam = [response.data.results[0].geometry.bounds.northeast.lng, response.data.results[0].geometry.bounds.southwest.lat];
             const southWestParam = [response.data.results[0].geometry.bounds.southwest.lng, response.data.results[0].geometry.bounds.southwest.lat];
             const northEastParam = [response.data.results[0].geometry.bounds.northeast.lng, response.data.results[0].geometry.bounds.northeast.lat];
             const northWestParam = [response.data.results[0].geometry.bounds.southwest.lng, response.data.results[0].geometry.bounds.northeast.lat];
 
-            console.log("SW", southWestParam, "SE", southEastParam, "NE", northEastParam, "NW", northWestParam)
-
             // store coordinates in array using correct format (should match grow-a-pear backend data)
             const param = [southWestParam, southEastParam, northEastParam, northWestParam]
 
-            console.log(param)
+            console.log(data[0], data[1], zone, "param", param)
+
+            // push array to csv output (output stored in correct variable from before)
+            fs.appendFile(output, `[[${param[0].toString()}], [${param[1].toString()}], [${param[2].toString()}], [${param[3].toString()}]]\n`, "utf8", function(err){
+                if (err) {
+                    console.log(err)
+                }
+            })
+
+            fs.appendFile("./inputs/completed_input.csv", `\n${data.toString()}, DONE`, "utf8", function(err){
+                if (err) {
+                    console.log(err)
+                }
+            })
+    
+            // fs.appendLine(csvFilePath, data, "", "utf8", function(err) {
+            //     if(err) {
+            //         console.log(err)
+            //     }
+            // })
         })
         .catch (error => {
+
+            // add to error output csv file
+            fs.appendFile("./outputs/input-errors.csv", `${data.toString()} params undefined, \n`, "utf8", function(err){
+                if (err) {
+                    console.log(err)
+                    console.log(data[0], data[1], zone, "error with google API")
+                }
+            })
+
             console.error("Error:", error.message)
         })
 
     
-    
-    
-
   });
 
 reader.on("close", () => {
