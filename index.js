@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 8080;
 const API_KEY = process.env.API_KEY;
 
 
-const csvFilePath = "./inputs/sample_input.csv";
+const csvFilePath = "./inputs/hardiness_zone_input_data.csv";
 
 function zoneParameters () {
     console.log(`function running on ${PORT} 🚀`)
