@@ -36,17 +36,18 @@ reader.on("line", row => {
         return
     }
 
-    console.log(data[0], data[1], output)
-
     if (zone === "") {
-        fs.appendFile("./outputs/input-errors.csv", `\n${data.toString()}`, "utf8", function(err){
+        fs.appendFile("./outputs/input-errors.csv", `${data.toString()}\n`, "utf8", function(err){
             if (err) {
                 console.log(err)
             }
         })
 
+        console.log(data[0], data[1], "error: no zone")
         return
     }
+
+    console.log(output)
 
     // axios request to geocoding API for municipality boundary coordinates (request is for "geometry")
     axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${data[0]}&${data[1]}$canada&key=${API_KEY}`)
@@ -60,12 +61,10 @@ reader.on("line", row => {
             const northEastParam = [response.data.results[0].geometry.bounds.northeast.lng, response.data.results[0].geometry.bounds.northeast.lat];
             const northWestParam = [response.data.results[0].geometry.bounds.southwest.lng, response.data.results[0].geometry.bounds.northeast.lat];
 
-            console.log("SW", southWestParam, "SE", southEastParam, "NE", northEastParam, "NW", northWestParam)
-
             // store coordinates in array using correct format (should match grow-a-pear backend data)
             const param = [southWestParam, southEastParam, northEastParam, northWestParam]
 
-            console.log("param", param)
+            console.log(data[0], data[1], zone, "param", param)
 
             fs.appendFile(output, `[${param.toString()}]\n`, "utf8", function(err){
                 if (err) {
