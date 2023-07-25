@@ -51,16 +51,27 @@ reader.on("line", row => {
     // axios request to geocoding API for municipality boundary coordinates (request is for "geometry")
     axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${data[0]}&${data[1]}$canada&key=${API_KEY}`)
         .then (response => {
-            const geocoding = response.data.results[0].geometry
-            console.log(geocoding)
+
+            // retrieve municipality boundary coordinates
+            const geocoding = response.data.results[0].geometry.bounds
+
+            const southEastParam = [response.data.results[0].geometry.bounds.northeast.lng, response.data.results[0].geometry.bounds.southwest.lat];
+            const southWestParam = [response.data.results[0].geometry.bounds.southwest.lng, response.data.results[0].geometry.bounds.southwest.lat];
+            const northEastParam = [response.data.results[0].geometry.bounds.northeast.lng, response.data.results[0].geometry.bounds.northeast.lat];
+            const northWestParam = [response.data.results[0].geometry.bounds.southwest.lng, response.data.results[0].geometry.bounds.northeast.lat];
+
+            console.log("SW", southWestParam, "SE", southEastParam, "NE", northEastParam, "NW", northWestParam)
+
+            // store coordinates in array using correct format (should match grow-a-pear backend data)
+            const param = [southWestParam, southEastParam, northEastParam, northWestParam]
+
+            console.log(param)
         })
         .catch (error => {
             console.error("Error:", error.message)
         })
 
-    // retrieve municipality boundary coordinates
-
-    // store coordinates in array using correct format (should match grow-a-pear backend data)
+    
     
     // push array to csv output (output stored in correct variable from before)
 
