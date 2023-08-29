@@ -39,6 +39,17 @@ reader.on("line", row => {
         return
     }
 
+    if (data[3] === "-999") {
+        fs.appendFile("./outputs/input-no-zone.csv", `${data.toString()} zone empty,\n`, "utf8", function(err){
+            if (err) {
+                console.log(err, data)
+            }
+        })
+        
+        console.log(data[0], data[1], "error: no zone")
+        return
+    }
+    
     if (zone === "") {
         fs.appendFile("./outputs/input-errors.csv", `${data.toString()} zone empty,\n`, "utf8", function(err){
             if (err) {
@@ -66,7 +77,7 @@ reader.on("line", row => {
             console.log(data[0], data[1], zone, "param", param)
 
             // push array to csv output (output stored in correct variable from before)
-            fs.appendFile(output, `[[${param[0].toString()}], [${param[1].toString()}], [${param[2].toString()}], [${param[3].toString()}]]\n`, "utf8", function(err){
+            fs.appendFile(output, `[[${param[0].toString()}], [${param[1].toString()}], [${param[2].toString()}], [${param[3].toString()}]],\n`, "utf8", function(err){
                 if (err) {
                     console.log(err)
                 }
