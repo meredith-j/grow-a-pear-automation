@@ -62,14 +62,28 @@ reader.on("line", row => {
     }
 
     // axios request to geocoding API for municipality boundary coordinates (request is for "geometry")
-    axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${data[0]}&${data[1]}$canada&key=${API_KEY}`)
+    
+    // to search by address use this axios.get request: (use this first)
+    axios.get(`https://maps.googleapis.com/maps/api/geocode/json?address=${data[0]}&${data[1]}&canada&key=${API_KEY}`)
+
+    // to search by administrative area use this axios.get request:
+    // axios.get(`https://maps.googleapis.com/maps/api/geocode/json?components=administrative_area:${data[0]}+${data[1]}|country:ca&key=${API_KEY}`)
+
         .then (response => {
 
-            // retrieve municipality boundary coordinates
+
+            // retrieve municipality boundary coordinates for responses that use bounds
+            // use this first
             const southEastParam = [response.data.results[0].geometry.bounds.northeast.lng, response.data.results[0].geometry.bounds.southwest.lat];
             const southWestParam = [response.data.results[0].geometry.bounds.southwest.lng, response.data.results[0].geometry.bounds.southwest.lat];
             const northEastParam = [response.data.results[0].geometry.bounds.northeast.lng, response.data.results[0].geometry.bounds.northeast.lat];
             const northWestParam = [response.data.results[0].geometry.bounds.southwest.lng, response.data.results[0].geometry.bounds.northeast.lat];
+
+            // retrieve municipality boundary coordinates for responses that use viewport
+            // const southEastParam = [response.data.results[0].geometry.viewport.northeast.lng, response.data.results[0].geometry.viewport.southwest.lat];
+            // const southWestParam = [response.data.results[0].geometry.viewport.southwest.lng, response.data.results[0].geometry.viewport.southwest.lat];
+            // const northEastParam = [response.data.results[0].geometry.viewport.northeast.lng, response.data.results[0].geometry.viewport.northeast.lat];
+            // const northWestParam = [response.data.results[0].geometry.viewport.southwest.lng, response.data.results[0].geometry.viewport.northeast.lat];
 
             // store coordinates in array using correct format (should match grow-a-pear backend data)
             const param = [southWestParam, southEastParam, northEastParam, northWestParam]
@@ -89,11 +103,6 @@ reader.on("line", row => {
                 }
             })
     
-            // fs.appendLine(csvFilePath, data, "", "utf8", function(err) {
-            //     if(err) {
-            //         console.log(err)
-            //     }
-            // })
         })
         .catch (error => {
 
@@ -106,9 +115,7 @@ reader.on("line", row => {
             })
 
             console.error("Error:", error.message)
-        })
-
-    
+        })  
   });
 
 reader.on("close", () => {
